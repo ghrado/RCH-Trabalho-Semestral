@@ -1,0 +1,608 @@
+classDiagram
+    %% ========================================
+    %% INTERFACES
+    %% ========================================
+    class Autenticavel {
+        <<interface>>
+        +autenticar(String usuario, String senha) boolean
+        +alterarSenha(String novaSenha) void
+        +isContaBloqueada() boolean
+        +bloquearConta() void
+        +desbloquearConta() void
+    }
+    
+    class Gerenciavel~T~ {
+        <<interface>>
+        +criar(T objeto) boolean
+        +buscar(String id) T
+        +listarTodos() List~T~
+        +atualizar(T objeto) boolean
+        +excluir(String id) boolean
+        +reintegrar(String id) boolean
+    }
+    
+    class Relatorio~T~ {
+        <<interface>>
+        +gerarRelatorioDiario(LocalDate data) List~T~
+        +gerarRelatorioSemanal(LocalDate dataInicio, LocalDate dataFim) List~T~
+        +gerarRelatorioMensal(int mes, int ano) List~T~
+        +exportarParaPDF(List~T~ dados, String nomeArquivo) boolean
+        +exibirGrafico(List~T~ dados) void
+    }
+    
+    %% ========================================
+    %% BASE CLASS
+    %% ========================================
+    class UniversalObject {
+        <<abstract>>
+        #String id
+        #LocalDateTime dataCriacao
+        #LocalDateTime dataModificacao
+        #boolean ativo
+        +getId() String
+        +setId(String id) void
+        +getDataCriacao() LocalDateTime
+        +getDataModificacao() LocalDateTime
+        +setDataModificacao(LocalDateTime) void
+        +isAtivo() boolean
+        +setAtivo(boolean ativo) void
+        +getDataCriacaoFormatada() String
+        +getDataModificacaoFormatada() String
+        +toString()* String
+        +equals(Object obj)* boolean
+        +hashCode()* int
+    }
+    
+    %% ========================================
+    %% MODEL - USUARIO HIERARCHY
+    %% ========================================
+    class Usuario {
+        <<abstract>>
+        -String nome
+        -String usuario
+        -String senha
+        -String email
+        -String telefone
+        -boolean contaBloqueada
+        -int tentativasLogin
+        +getNome() String
+        +setNome(String) void
+        +getUsuario() String
+        +setUsuario(String) void
+        +getSenha() String
+        +setSenha(String) void
+        +getEmail() String
+        +setEmail(String) void
+        +getTelefone() String
+        +setTelefone(String) void
+    }
+    
+    class Administrador {
+        -String nivelAcesso
+        +getNivelAcesso() String
+        +setNivelAcesso(String) void
+    }
+    
+    class Gerente {
+        -String departamento
+        -double salario
+        +getDepartamento() String
+        +setDepartamento(String) void
+        +getSalario() double
+        +setSalario(double) void
+    }
+    
+    class Vendedor {
+        -double comissao
+        -double metaVendas
+        +getComissao() double
+        +setComissao(double) void
+        +getMetaVendas() double
+        +setMetaVendas(double) void
+    }
+    
+    class Caixa {
+        -String turno
+        -double saldoInicial
+        +getTurno() String
+        +setTurno(String) void
+        +getSaldoInicial() double
+        +setSaldoInicial(double) void
+    }
+    
+    %% ========================================
+    %% MODEL - CLIENTE HIERARCHY
+    %% ========================================
+    class Cliente {
+        <<abstract>>
+        -String nome
+        -String telefone
+        -String email
+        -String endereco
+        +getNome() String
+        +setNome(String) void
+        +getTelefone() String
+        +setTelefone(String) void
+        +getEmail() String
+        +setEmail(String) void
+        +getEndereco() String
+        +setEndereco(String) void
+    }
+    
+    class ClienteSingular {
+        -String cpf
+        -LocalDate dataNascimento
+        +getCpf() String
+        +setCpf(String) void
+        +getDataNascimento() LocalDate
+        +setDataNascimento(LocalDate) void
+    }
+    
+    class ClienteEmpresa {
+        -String nuit
+        -String razaoSocial
+        -String nomeFantasia
+        +getNuit() String
+        +setNuit(String) void
+        +getRazaoSocial() String
+        +setRazaoSocial(String) void
+        +getNomeFantasia() String
+        +setNomeFantasia(String) void
+    }
+    
+    %% ========================================
+    %% MODEL - BUSINESS ENTITIES
+    %% ========================================
+    class Produto {
+        -String nome
+        -String descricao
+        -double preco
+        -int quantidadeEstoque
+        -String categoria
+        -String unidadeMedida
+        +getNome() String
+        +setNome(String) void
+        +getPreco() double
+        +setPreco(double) void
+        +getQuantidadeEstoque() int
+        +setQuantidadeEstoque(int) void
+    }
+    
+    class Ordem {
+        -String clienteId
+        -String vendedorId
+        -LocalDateTime dataOrdem
+        -String status
+        -double valorTotal
+        -String observacoes
+        +getClienteId() String
+        +setClienteId(String) void
+        +getVendedorId() String
+        +setVendedorId(String) void
+        +getStatus() String
+        +setStatus(String) void
+        +getValorTotal() double
+        +calcularTotal() void
+    }
+    
+    class ItemOrdem {
+        -String ordemId
+        -String produtoId
+        -int quantidade
+        -double precoUnitario
+        -double subtotal
+        +getOrdemId() String
+        +setOrdemId(String) void
+        +getProdutoId() String
+        +setProdutoId(String) void
+        +getQuantidade() int
+        +setQuantidade(int) void
+        +calcularSubtotal() void
+    }
+    
+    class Pagamento {
+        -String ordemId
+        -String tipoPagamento
+        -double valor
+        -LocalDateTime dataPagamento
+        -String status
+        -String referencia
+        +getOrdemId() String
+        +setOrdemId(String) void
+        +getTipoPagamento() String
+        +setTipoPagamento(String) void
+        +getValor() double
+        +setValor(double) void
+        +getStatus() String
+        +setStatus(String) void
+    }
+    
+    class Fatura {
+        -String ordemId
+        -String clienteId
+        -LocalDateTime dataEmissao
+        -double valorTotal
+        -String status
+        -String numeroFatura
+        +getOrdemId() String
+        +setOrdemId(String) void
+        +getClienteId() String
+        +setClienteId(String) void
+        +getNumeroFatura() String
+        +gerarNumeroFatura() void
+    }
+    
+    class AuditLog {
+        -String id
+        -String usuarioId
+        -String acao
+        -String entidade
+        -String detalhes
+        -LocalDateTime timestamp
+        +getUsuarioId() String
+        +setUsuarioId(String) void
+        +getAcao() String
+        +setAcao(String) void
+        +getEntidade() String
+        +setEntidade(String) void
+    }
+    
+    %% ========================================
+    %% CONTROLLER/SERVICE LAYER
+    %% ========================================
+    class ControleGestorService {
+        -DatabaseConnection dbConnection
+        -AuditService auditService
+        +criar(Usuario objeto) boolean
+        +buscar(String id) Usuario
+        +listarTodos() List~Usuario~
+        +atualizar(Usuario objeto) boolean
+        +excluir(String id) boolean
+        +reintegrar(String id) boolean
+        +buscarPorUsuario(String usuario) Usuario
+        +buscarPorTipo(String tipo) List~Usuario~
+    }
+    
+    class UsuarioService {
+        -DatabaseConnection dbConnection
+        +criar(Usuario objeto) boolean
+        +buscar(String id) Usuario
+        +listarTodos() List~Usuario~
+        +atualizar(Usuario objeto) boolean
+        +excluir(String id) boolean
+        +reintegrar(String id) boolean
+    }
+    
+    class VendasService {
+        -DatabaseConnection dbConnection
+        -AuditService auditService
+        +criar(Cliente objeto) boolean
+        +buscar(String id) Cliente
+        +listarTodos() List~Cliente~
+        +atualizar(Cliente objeto) boolean
+        +excluir(String id) boolean
+        +criarOrdem(Ordem ordem) boolean
+        +adicionarItemOrdem(ItemOrdem item) boolean
+        +finalizarOrdem(String ordemId) boolean
+        +listarOrdensAbertas() List~Ordem~
+    }
+    
+    class StockService {
+        -DatabaseConnection dbConnection
+        -AuditService auditService
+        +criar(Produto objeto) boolean
+        +buscar(String id) Produto
+        +listarTodos() List~Produto~
+        +atualizar(Produto objeto) boolean
+        +excluir(String id) boolean
+        +reintegrar(String id) boolean
+        +atualizarEstoque(String produtoId, int quantidade) boolean
+        +verificarEstoqueBaixo() List~Produto~
+    }
+    
+    class CaixaService {
+        -DatabaseConnection dbConnection
+        -AuditService auditService
+        +registrarPagamento(Pagamento pagamento) boolean
+        +buscarPagamento(String id) Pagamento
+        +listarPagamentosPorOrdem(String ordemId) List~Pagamento~
+        +gerarResumoFechoCaixa() Map~String, Double~
+        +fecharCaixa(String usuarioId) boolean
+    }
+    
+    class RelatoriosService {
+        -DatabaseConnection dbConnection
+        -PDFGenerator pdfGenerator
+        +gerarRelatorioDiario(LocalDate data) List~Object~
+        +gerarRelatorioSemanal(LocalDate inicio, LocalDate fim) List~Object~
+        +gerarRelatorioMensal(int mes, int ano) List~Object~
+        +gerarRelatorioConsolidado() List~Object~
+        +exportarParaPDF(List dados, String arquivo) boolean
+        +exibirGrafico(List dados) void
+    }
+    
+    %% ========================================
+    %% UTILITY CLASSES
+    %% ========================================
+    class DatabaseConnection {
+        -Connection connection
+        -String url
+        -String usuario
+        -String senha
+        +getConnection() Connection
+        +closeConnection() void
+        +executarQuery(String sql) ResultSet
+        +executarUpdate(String sql) int
+    }
+    
+    class AuthenticationManager {
+        -ControleGestorService gestorService
+        +autenticar(String usuario, String senha) Usuario
+        +validarSessao(String token) boolean
+        +logout(String usuarioId) void
+    }
+    
+    class AuditService {
+        -DatabaseConnection dbConnection
+        +registrarAcao(String usuarioId, String acao, String entidade, String detalhes) void
+        +buscarLogsPorUsuario(String usuarioId) List~AuditLog~
+        +buscarLogsPorPeriodo(LocalDate inicio, LocalDate fim) List~AuditLog~
+    }
+    
+    class GeradorID {
+        +gerarID(String prefixo) String
+        +gerarIDUnico() String
+    }
+    
+    class FieldValidator {
+        +validarEmail(String email) boolean
+        +validarTelefone(String telefone) boolean
+        +validarCPF(String cpf) boolean
+        +validarNUIT(String nuit) boolean
+        +validarCampoObrigatorio(String campo) boolean
+    }
+    
+    class PDFGenerator {
+        +gerarFatura(Fatura fatura) void
+        +gerarRelatorio(List dados, String titulo) void
+        +adicionarCabecalho(Document doc) void
+        +adicionarRodape(Document doc) void
+    }
+    
+    %% ========================================
+    %% VIEW LAYER - MAIN SCREENS
+    %% ========================================
+    class Login {
+        -AuthenticationManager authManager
+        -ControleGestorService gestorService
+        +validarLogin() void
+        +redirecionarPorTipo(Usuario usuario) void
+    }
+    
+    class TelaAdministrador {
+        -Usuario usuarioLogado
+        -ControleGestorService gestorService
+        +abrirTelaControle() void
+        +abrirTelaRelatorios() void
+        +abrirTelaFechoCaixa() void
+    }
+    
+    class TelaGerente {
+        -Usuario usuarioLogado
+        -VendasService vendasService
+        -StockService stockService
+        +abrirTelaVendas() void
+        +abrirTelaStock() void
+    }
+    
+    class TelaVendedor {
+        -Usuario usuarioLogado
+        -VendasService vendasService
+        +abrirTelaVendas() void
+    }
+    
+    class TelaCaixa {
+        -Usuario usuarioLogado
+        -CaixaService caixaService
+        +abrirTelaCaixaOpcoes() void
+    }
+    
+    %% ========================================
+    %% VIEW LAYER - FEATURE SCREENS
+    %% ========================================
+    class TelaControleOpcoes {
+        -Usuario usuarioLogado
+        -ControleGestorService gestorService
+        +abrirTelaGerenciarUsuario() void
+    }
+    
+    class TelaGerenciarUsuario {
+        -ControleGestorService gestorService
+        +listarUsuarios() void
+        +criarUsuario() void
+        +editarUsuario() void
+        +excluirUsuario() void
+    }
+    
+    class TelaVendas {
+        -Usuario usuarioLogado
+        -VendasService vendasService
+        -StockService stockService
+        +abrirTelaClientes() void
+        +abrirTelaOrdem() void
+    }
+    
+    class TelaClientes {
+        -VendasService vendasService
+        +listarClientes() void
+        +criarCliente() void
+        +editarCliente() void
+        +excluirCliente() void
+    }
+    
+    class TelaOrdem {
+        -Usuario usuarioLogado
+        -VendasService vendasService
+        -StockService stockService
+        +criarOrdem() void
+        +adicionarItem() void
+        +finalizarOrdem() void
+        +calcularTotal() void
+    }
+    
+    class TelaStockOpcoes {
+        -Usuario usuarioLogado
+        -StockService stockService
+        +listarProdutos() void
+        +criarProduto() void
+        +editarProduto() void
+        +excluirProduto() void
+    }
+    
+    class TelaCaixaOpcoes {
+        -Usuario usuarioLogado
+        -CaixaService caixaService
+        +abrirTelaOrdemPagamento() void
+        +abrirTelaLancamentoPagamento() void
+    }
+    
+    class TelaOrdemPagamento {
+        -CaixaService caixaService
+        -VendasService vendasService
+        +listarOrdensAbertas() void
+        +selecionarOrdem() void
+        +processarPagamento() void
+    }
+    
+    class TelaLancamentoPagamento {
+        -CaixaService caixaService
+        +registrarPagamento() void
+        +selecionarTipoPagamento() void
+    }
+    
+    class TelaFechoCaixa {
+        -Usuario usuarioLogado
+        -CaixaService caixaService
+        +gerarResumo() void
+        +fecharCaixa() void
+        +imprimirRelatorio() void
+    }
+    
+    class TelaRelatorios {
+        -Usuario usuarioLogado
+        -RelatoriosService relatoriosService
+        +abrirRelatorioConsolidado() void
+        +abrirRelatorioSemanal() void
+        +abrirRelatorioMensal() void
+        +abrirRelatorioAnual() void
+    }
+    
+    class RelatoriosDialog {
+        -RelatoriosService relatoriosService
+        +gerarRelatorio() void
+        +exportarPDF() void
+        +exibirGrafico() void
+    }
+    
+    %% ========================================
+    %% RELATIONSHIPS - INHERITANCE
+    %% ========================================
+    UniversalObject <|-- Usuario
+    UniversalObject <|-- Cliente
+    UniversalObject <|-- Produto
+    UniversalObject <|-- Ordem
+    UniversalObject <|-- ItemOrdem
+    UniversalObject <|-- Pagamento
+    UniversalObject <|-- Fatura
+    
+    Usuario <|-- Administrador
+    Usuario <|-- Gerente
+    Usuario <|-- Vendedor
+    Usuario <|-- Caixa
+    
+    Cliente <|-- ClienteSingular
+    Cliente <|-- ClienteEmpresa
+    
+    %% ========================================
+    %% RELATIONSHIPS - INTERFACE IMPLEMENTATION
+    %% ========================================
+    Usuario ..|> Autenticavel
+    ControleGestorService ..|> Gerenciavel
+    UsuarioService ..|> Gerenciavel
+    VendasService ..|> Gerenciavel
+    StockService ..|> Gerenciavel
+    RelatoriosService ..|> Relatorio
+    
+    %% ========================================
+    %% RELATIONSHIPS - COMPOSITION/AGGREGATION
+    %% ========================================
+    ControleGestorService --> DatabaseConnection : uses
+    ControleGestorService --> AuditService : uses
+    UsuarioService --> DatabaseConnection : uses
+    VendasService --> DatabaseConnection : uses
+    VendasService --> AuditService : uses
+    StockService --> DatabaseConnection : uses
+    StockService --> AuditService : uses
+    CaixaService --> DatabaseConnection : uses
+    CaixaService --> AuditService : uses
+    RelatoriosService --> DatabaseConnection : uses
+    RelatoriosService --> PDFGenerator : uses
+    
+    AuthenticationManager --> ControleGestorService : uses
+    AuditService --> DatabaseConnection : uses
+    
+    %% ========================================
+    %% RELATIONSHIPS - VIEW TO CONTROLLER
+    %% ========================================
+    Login --> AuthenticationManager : uses
+    Login --> ControleGestorService : uses
+    
+    TelaAdministrador --> ControleGestorService : uses
+    TelaGerente --> VendasService : uses
+    TelaGerente --> StockService : uses
+    TelaVendedor --> VendasService : uses
+    TelaCaixa --> CaixaService : uses
+    
+    TelaControleOpcoes --> ControleGestorService : uses
+    TelaGerenciarUsuario --> ControleGestorService : uses
+    TelaVendas --> VendasService : uses
+    TelaVendas --> StockService : uses
+    TelaClientes --> VendasService : uses
+    TelaOrdem --> VendasService : uses
+    TelaOrdem --> StockService : uses
+    TelaStockOpcoes --> StockService : uses
+    TelaCaixaOpcoes --> CaixaService : uses
+    TelaOrdemPagamento --> CaixaService : uses
+    TelaOrdemPagamento --> VendasService : uses
+    TelaLancamentoPagamento --> CaixaService : uses
+    TelaFechoCaixa --> CaixaService : uses
+    TelaRelatorios --> RelatoriosService : uses
+    RelatoriosDialog --> RelatoriosService : uses
+    
+    %% ========================================
+    %% RELATIONSHIPS - NAVIGATION
+    %% ========================================
+    Login ..> TelaAdministrador : creates
+    Login ..> TelaGerente : creates
+    Login ..> TelaVendedor : creates
+    Login ..> TelaCaixa : creates
+    
+    TelaAdministrador ..> TelaControleOpcoes : creates
+    TelaAdministrador ..> TelaRelatorios : creates
+    TelaAdministrador ..> TelaFechoCaixa : creates
+    
+    TelaControleOpcoes ..> TelaGerenciarUsuario : creates
+    
+    TelaGerente ..> TelaVendas : creates
+    TelaGerente ..> TelaStockOpcoes : creates
+    
+    TelaVendedor ..> TelaVendas : creates
+    
+    TelaVendas ..> TelaClientes : creates
+    TelaVendas ..> TelaOrdem : creates
+    
+    TelaCaixa ..> TelaCaixaOpcoes : creates
+    TelaCaixaOpcoes ..> TelaOrdemPagamento : creates
+    TelaCaixaOpcoes ..> TelaLancamentoPagamento : creates
+    
+    TelaRelatorios ..> RelatoriosDialog : creates
